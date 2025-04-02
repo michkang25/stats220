@@ -83,6 +83,3 @@ most_common_activity <- latest_data %>%
 cat(paste0("The most frequently observed activity on the bus was: ", most_common_activity, ".\n"))
 ```
 
-The best pet to have is a `r best_pet` of course!
-
-![](https://c.tenor.com/-qBsG1HwR4oAAAAC/tenor.gif)
