@@ -1,0 +1,88 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+.pink-bold {
+    color: pink;
+    font-weight: bold;
+    font-family: "Comic Sans MS", "Arial", sans-serif; 
+}
+
+```
+
+## Analyzing Passenger Trends and Bus Punctuality
+
+This report explores key insights from bus trip observations, focusing on three main aspects:
+
+-   **Bus Occupancy**: The number of passengers present at the time of boarding.\
+-   **Common Activities**: The most frequent activities observed among passengers.\
+-   **Punctuality**: Whether the bus arrived early, on time, or late.
+
+```{r}
+library(tidyverse)
+csv_url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyRm_2b-nH2O3M85NNH7vvxxj3du0WADRJWjiqCLmGQVTK5ORuzEvWv0wbJzFs2ox11XHu9iEhni8A/pub?output=csv"
+logged_data <- read_csv(csv_url)
+
+latest_data <- logged_data %>%
+  rename(
+    Bus_Occupancy = `How many people were on the bus when you boarded?`,
+    Common_Activity = `What was the most common activity people were doing?`,
+    Punctuality = `How punctual was the bus?`
+  )
+
+
+min_people <- min(latest_data$Bus_Occupancy, na.rm = TRUE)
+max_people <- max(latest_data$Bus_Occupancy, na.rm = TRUE)
+mean_people <- mean(latest_data$Bus_Occupancy, na.rm = TRUE)
+total_responses <- nrow(latest_data)
+
+# Print summary values
+cat("Min people on bus:", min_people, "\n")
+cat("Max people on bus:", max_people, "\n")
+cat("Mean people on bus:", mean_people, "\n")
+cat("Total number of responses:", total_responses, "\n")
+
+# Bar Chart: Activity distribution
+ggplot(latest_data, aes(x = reorder(Common_Activity, table(Common_Activity)[Common_Activity]), fill = Common_Activity)) +
+  geom_bar() +
+  labs(title = "Distribution of Activities on the Bus", x = "Most Common Activity", y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Bar Chart: Bus Punctuality
+ggplot(latest_data, aes(x = reorder(Punctuality, table(Punctuality)[Punctuality]), fill = Punctuality)) +
+  geom_bar() +
+  labs(title = "Bus Punctuality Distribution", x = "Bus Punctuality", y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+# Dynamic comments for punctuality distribution
+most_common_punctuality <- latest_data %>%
+  count(Punctuality) %>%
+  arrange(desc(n)) %>%
+  slice(1) %>%
+  pull(Punctuality)
+
+cat(paste0("The most frequently recorded bus punctuality status was: ", most_common_punctuality, ".\n"))
+
+# Determine the most common activity
+most_common_activity <- latest_data %>%
+  count(Common_Activity) %>%
+  arrange(desc(n)) %>%
+  slice(1) %>%
+  pull(Common_Activity)
+
+cat(paste0("The most frequently observed activity on the bus was: ", most_common_activity, ".\n"))
+```
+
+The best pet to have is a `r best_pet` of course!
+
+![](https://c.tenor.com/-qBsG1HwR4oAAAAC/tenor.gif)
